@@ -81,6 +81,10 @@
 
 </pre>
 </div>
+<div id="btns" style="display: none;">
+    <button onclick="setprogress(0.1)">进度+</button>
+    <button onclick="setprogress(-0.1)">进度-</button>
+</div>
 
 </div>
 <script src="dist/APlayer.min.js"></script> 
@@ -102,27 +106,31 @@
     var my = false
     var diff = 300
     var videobz = document.getElementById('video')
+    var btns = document.getElementById('btns')
     var isauthor = window.location.href.indexOf('author=joubn')>-1
     if(isauthor){
         videobz.style.display = "block"
+        btns.style.display = "block"
         document.querySelector('.aplayer-pic').style.display = 'none'
     }else{
 
     }
     ap.on('play', function () {
         my = true 
-        var time = new Date().getTime()
-        websocket.send('goplay::'+ap.audio.currentTime+'::'+time)
+        websocket.send('goplay::'+ap.audio.currentTime)
     });
     ap.on('pause',function(){
         websocket.send('gopause')
     })
-    function playbz(currentTime,time){
-        var ntime = new Date().getTime()
-        var wlyc = (ntime-time)/1000
-        console.log(currentTime,wlyc)
+
+    function setprogress(step){
+       videobz.currentTime =  videobz.currentTime+step
+    }
+
+
+    function playbz(time){
         videobz.play()
-        videobz.currentTime = currentTime - diff/1000 + wlyc
+        videobz.currentTime = time - diff/1000
         ap.volume(0, true);
         
     }
@@ -133,9 +141,8 @@
         var mis = JSON.parse(e.data)
         console.log(mis.data)
         if(!my&&mis.data.indexOf('goplay')>-1 ){
-            var currentTime = Number(mis.data.split('::')[1])
-            var time = Number(mis.data.split('::')[2])
-            playbz(currentTime,time)
+            var time = Number(mis.data.split('::')[1])
+            playbz(time)
         }
         if(!my&&mis.data.indexOf('gopause')>-1 ){
             videobz.pause()
