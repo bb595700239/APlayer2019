@@ -111,14 +111,18 @@
     }
     ap.on('play', function () {
         my = true 
-        websocket.send('goplay::'+ap.audio.currentTime)
+        var time = new Date().getTime()
+        websocket.send('goplay::'+ap.audio.currentTime+'::'+time)
     });
     ap.on('pause',function(){
         websocket.send('gopause')
     })
-    function playbz(time){
+    function playbz(currentTime,time){
+        var ntime = new Date().getTime()
+        var wlyc = (ntime-time)/1000
+        console.log(currentTime,wlyc)
         videobz.play()
-        videobz.currentTime = time - diff/1000
+        videobz.currentTime = currentTime - diff/1000 + wlyc
         ap.volume(0, true);
         
     }
@@ -129,8 +133,9 @@
         var mis = JSON.parse(e.data)
         console.log(mis.data)
         if(!my&&mis.data.indexOf('goplay')>-1 ){
-            var time = Number(mis.data.split('::')[1])
-            playbz(time)
+            var currentTime = Number(mis.data.split('::')[1])
+            var time = Number(mis.data.split('::')[2])
+            playbz(currentTime,time)
         }
         if(!my&&mis.data.indexOf('gopause')>-1 ){
             videobz.pause()
