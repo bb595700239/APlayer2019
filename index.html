@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>突然想起你-joubn</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="dist/APlayer.min.css">
+        <style>
+        body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;}.container{max-width:32rem;margin-left:auto;margin-right:auto;}h1{font-size:54px;color:#333;margin:30px 0 10px;}h2{font-size:22px;color:#555;}h3{font-size:24px;color:#555;}hr{display:block;width:7rem;height:1px;margin:2.5rem 0;background-color:#eee;border:0;}a{color:#08c;text-decoration:none;}p{font-size:18px;}
+        </style>
+    </head>
+<body>
+    <div>
+<video id="video" style="display: none;" src="music/突然想起你伴奏.mp3" controls="controls">
+您的浏览器不支持 video 标签。
+</video>
+<div class="container">
+<div id="player3" class="aplayer">
+<pre class="aplayer-lrc-content">
+[00:00.00]王北车 - 突然想起你
+[00:01.15]作词：林夕
+[00:01.86]作曲：陈伟
+[00:02.57]编曲：牛子健
+[00:03.48]录音：李悦
+[00:04.18]混音：李琰祥
+[00:05.06]吉他：牛子健
+[00:05.92]配唱监制：开开（赵锴羿）
+[00:07.74]和声：胜屿
+[00:08.51]制作人：胜屿
+[00:19.63]都是因为那灯泡
+[00:24.18]突然闪了一下于是想起你
+[00:29.87]怕你 还没休息
+[00:38.08]都是因为这场雨
+[00:42.37]忽然间下的那么大怕来不及
+[00:48.14]跟你 走在一起
+[00:54.76]一个人的夜
+[00:56.43]我的心 应该放在哪里
+[00:59.62]拥抱过后
+[01:01.09]我的双手应该放在哪里
+[01:04.27]我始终学不会控制
+[01:07.46]我的呼吸
+[01:08.88]在玻璃窗上
+[01:10.90]呵出你美丽的名字
+[01:13.43]寂寞来袭
+[01:14.91]旧雨衣 应该放在哪里
+[01:18.10]想念着你
+[01:19.56]我的念头应该想到哪里
+[01:22.75]有什么方法
+[01:24.88]让两个人不分离
+[01:42.71]都是因为这场雨
+[01:46.96]忽然间下的那么大怕来不及
+[01:52.88]跟你 走在一起
+[01:59.41]一个人的夜
+[02:01.08]我的心 应该放在哪里
+[02:04.21]拥抱过后
+[02:05.73]我的双手应该放在哪里
+[02:08.87]我始终学不会控制
+[02:12.11]我的呼吸
+[02:13.47]在玻璃窗上
+[02:15.50]呵出你美丽的名字
+[02:18.09]寂寞来袭
+[02:19.50]旧雨衣 应该放在哪里
+[02:22.75]想念着你
+[02:24.16]我的念头应该想到哪里
+[02:27.32]有什么方法
+[02:29.29]让两个人不分离
+[02:54.75]一个人的夜
+[02:56.42]我的心 应该放在哪里
+[02:59.61]拥抱过后
+[03:01.08]我的双手应该放在哪里
+[03:04.22]我始终学不会控制
+[03:07.45]我的呼吸
+[03:08.87]在玻璃窗上
+[03:10.89]呵出你美丽的名字
+[03:13.41]寂寞来袭
+[03:14.88]旧雨衣 应该放在哪里
+[03:18.11]想念着你
+[03:19.53]我的念头应该想到哪里
+[03:22.72]有什么方法
+[03:24.69]让两个人不分离
+
+</pre>
+</div>
+
+</div>
+<script src="dist/APlayer.min.js"></script> 
+<script>
+
+    var ap = new APlayer({
+        element: document.getElementById('player3'),
+        narrow: false,
+        autoplay: false,
+        showlrc: true,
+        music: {
+            title: '突然想起你',
+            author: '周标',
+            url: 'music/突然想起你.mp3',
+            pic: 'music/joubn.jpeg'
+        }
+    });
+    var once = true
+    var my = false
+    var diff = 300
+    var videobz = document.getElementById('video')
+    var isauthor = window.location.href.indexOf('author=joubn')>-1
+    if(isauthor){
+        videobz.style.display = "block"
+        document.querySelector('.aplayer-pic').style.display = 'none'
+    }else{
+
+    }
+    ap.on('play', function () {
+        my = true 
+        websocket.send('goplay::'+ap.audio.currentTime)
+    });
+    ap.on('pause',function(){
+        websocket.send('gopause')
+    })
+    function playbz(time){
+        videobz.play()
+        videobz.currentTime = time - diff/1000
+        ap.volume(0, true);
+        
+    }
+
+
+    var websocket = new WebSocket('ws://212.64.24.247:3002/')
+    websocket.onmessage = function(e){
+        var mis = JSON.parse(e.data)
+        console.log(mis.data)
+        if(!my&&mis.data.indexOf('goplay')>-1 ){
+            var time = Number(mis.data.split('::')[1])
+            playbz(time)
+        }
+        if(!my&&mis.data.indexOf('gopause')>-1 ){
+            videobz.pause()
+        }
+    }
+</script>
+
+</div>
+</body>
+</html>
